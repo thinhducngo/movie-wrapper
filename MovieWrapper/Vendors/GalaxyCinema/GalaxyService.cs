@@ -21,7 +21,7 @@ namespace MovieWrapper.Vendors.GalaxyCinema
 
         public GalaxyService(string domain, IRequester requester)
         {
-            _domain = domain;
+            _domain = domain.TrimEnd(new[] { '/' });
             _requester = requester;
         }
 
