@@ -177,13 +177,7 @@ namespace MovieWrapper.Vendors.Lotteria
                     {
                         Success = true,
                         Data = movieSessions
-                            .Select(x => {
-                                var movieSession = Mapper.MapToMovieSession(x);
-                                movieSession.MovieId = movieId; // Lotte does not return move id
-                                if (cinemaAddressDict.ContainsKey(x.CinemaID)) movieSession.Location = cinemaAddressDict[x.CinemaID];
-
-                                return movieSession;
-                            })
+                            .Select(x => Mapper.MapToMovieSession(x, movieId, cinemaAddressDict))   // Lotte does not return move id
                             .ToList()
                     };
                 }

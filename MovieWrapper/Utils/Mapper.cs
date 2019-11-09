@@ -1,6 +1,7 @@
 ﻿using MovieWrapper.Models;
 using MovieWrapper.Vendors.GalaxyCinema.Models;
 using MovieWrapper.Vendors.LotteCinema.Models;
+using System.Collections.Generic;
 
 namespace MovieWrapper.Utils
 {
@@ -33,21 +34,16 @@ namespace MovieWrapper.Utils
         /// Map Galaxy movie session model to app movie session model
         /// </summary>
         /// <param name="galaxyMovieSession">Galaxy movie session model separated by date</param>
+        /// <param name="movieId">>Galaxy movie id</param>
         /// <returns>App Movie session model</returns>
-        public static MovieSession MapToMovieSession(GalaxyMovieSessionItem galaxyMovieSession)
+        public static MovieSession MapToMovieSession(GalaxyMovieSessionItem galaxyMovieSession, string movieId)
         {
             return new MovieSession
             {
+                MovieId = movieId,
                 Location = galaxyMovieSession.Address,
                 ShowDate = galaxyMovieSession.ShowDate,
                 ShowTime = galaxyMovieSession.ShowTime
-                /* Dates = galaxyMovieSession.Dates
-                    .SelectMany(date => date.Bundles.SelectMany(bundle => bundle.Sessions.Select(x => new MovieSessionDate
-                    {
-                        ShowDate = x.ShowDate,
-                        ShowTime = x.ShowTime
-                    })))
-                    .ToList()    */
             };
         }
         #endregion
@@ -90,20 +86,21 @@ namespace MovieWrapper.Utils
         /// Map Galaxy movie session model to app movie session model
         /// </summary>
         /// <param name="lotteMovieSession">Lotte movie seesion model</param>
+        /// <param name="moveId">Lotte movie id</param>
+        /// <param name="cinemaAddressDict">Lotte cinema address dictionary (key: CinemaID)</param>
         /// <returns>App Movie model</returns>
-        public static MovieSession MapToMovieSession(LotteMovieSession lotteMovieSession)
+        public static MovieSession MapToMovieSession(
+            LotteMovieSession lotteMovieSession,
+            string movieId,
+            Dictionary<string, string> cinemaAddressDict)
         {
             return new MovieSession
             {
+                MovieId = movieId,
+                Location = cinemaAddressDict.ContainsKey(lotteMovieSession.CinemaID) ?
+                    cinemaAddressDict[lotteMovieSession.CinemaID] : string.Empty,
                 ShowDate = lotteMovieSession.PlayDt,
                 ShowTime = lotteMovieSession.StartTime
-                /* Dates = lotteMovieSession
-                    .SelectMany(date => date.Bundles.SelectMany(bundle => bundle.Sessions.Select(x => new MovieSessionDate
-                    {
-                        ShowDate = x.ShowDate,
-                        ShowTime = x.ShowTime
-                    })))
-                    .ToList() */
             };
         }
         #endregion

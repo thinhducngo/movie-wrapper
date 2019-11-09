@@ -11,14 +11,17 @@ namespace MovieWrapper.Vendors.GalaxyCinema
     public class GalaxyService : IVendorService
     {
         private readonly string _domain;
-        public GalaxyService()
+        private readonly IRequester _requester;
+        public GalaxyService(IRequester requester)
         {
             _domain = "https://www.galaxycine.vn";
+            _requester = requester;
         }
 
-        public GalaxyService(string domain)
+        public GalaxyService(string domain, IRequester requester)
         {
             _domain = domain;
+            _requester = requester;
         }
 
         /// <summary>
@@ -31,8 +34,7 @@ namespace MovieWrapper.Vendors.GalaxyCinema
             // Handle request exception
             try
             {
-                var request = new Requester();
-                var response = await request.Get<ShowAndComingModel>($"{_domain}/api/movie/showAndComming");
+                var response = await _requester.Get<ShowAndComingModel>($"{_domain}/api/movie/showAndComming");
 
                 return new MovieListResult
                 {
@@ -64,8 +66,7 @@ namespace MovieWrapper.Vendors.GalaxyCinema
             // Handle request exception
             try
             {
-                var request = new Requester();
-                var response = await request.Get<ShowAndComingModel>($"{_domain}/api/movie/showAndComming");
+                var response = await _requester.Get<ShowAndComingModel>($"{_domain}/api/movie/showAndComming");
 
                 var guidId = new Guid(movieId);
                 var movie = response.MovieShowing.Concat(response.MovieCommingSoon).FirstOrDefault(x => x.Id == guidId);
@@ -107,31 +108,14 @@ namespace MovieWrapper.Vendors.GalaxyCinema
             // Handle request exception
             try
             {
-                var request = new Requester();
-                var response = await request.Get<List<GalaxyMovieSession>>($"{_domain}/api/session/movie/{movieId}");
-                var sessionItems = response.SelectMany(x => x.Dates
-                    .SelectMany(date => date.Bundles
-                        .SelectMany(bundle => bundle.Sessions
-                            .Select(session =>
-                            {
-                                return new GalaxyMovieSessionItem
-                                {
-                                    Address = x.Address,
-                                    ShowDate = session.ShowDate,
-                                    ShowTime = session.ShowTime
-                                };
-                            }))));
+                var response = await _requester.Get<List<GalaxyMovieSession>>($"{_domain}/api/session/movie/{movieId}");
+                var sessionItems = SplitSessions(response);
 
                 return new MovieSessionListResult
                 {
                     Success = true,
                     Data = sessionItems
-                        .Select(x => {
-                            var movieSession = Mapper.MapToMovieSession(x);
-                            movieSession.MovieId = movieId;  // Galaxy does not return move id
-
-                            return movieSession;
-                        })
+                        .Select(x => Mapper.MapToMovieSession(x, movieId))  // Galaxy does not return move id
                         .ToList()
                 };
             }
@@ -143,6 +127,28 @@ namespace MovieWrapper.Vendors.GalaxyCinema
                     Message = e.Message
                 };
             }
+        }
+
+        /// <summary>
+        /// In one session contains multiple group of date and time -> split
+        /// </summary>
+        /// <param name="sessions">Galaxy movie session model</param>
+        /// <returns></returns>
+        public IList<GalaxyMovieSessionItem> SplitSessions(List<GalaxyMovieSession> sessions)
+        {
+            return sessions.SelectMany(x => x.Dates
+                .SelectMany(date => date.Bundles
+                    .SelectMany(bundle => bundle.Sessions
+                    .Select(session =>
+                    {
+                        return new GalaxyMovieSessionItem
+                        {
+                            Address = x.Address,
+                            ShowDate = session.ShowDate,
+                            ShowTime = session.ShowTime
+                        };
+                    }))))
+                .ToList();
         }
     }
 }

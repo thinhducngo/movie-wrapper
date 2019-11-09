@@ -30,7 +30,7 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService();
+                var galaxyService = new GalaxyService(new Requester());
                 return await galaxyService.GetShowingMovies();
             }
             else if (type == VendorType.Lotteria)
@@ -57,7 +57,7 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService(domain);
+                var galaxyService = new GalaxyService(domain, new Requester());
                 return await galaxyService.GetShowingMovies();
             }
             else if (type == VendorType.Lotteria)
@@ -87,7 +87,7 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService();
+                var galaxyService = new GalaxyService(new Requester());
                 return await galaxyService.GetMovieDetails(movieId);
             }
             else if (type == VendorType.Lotteria)
@@ -115,7 +115,7 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService(domain);
+                var galaxyService = new GalaxyService(domain, new Requester());
                 return await galaxyService.GetMovieDetails(movieId);
             }
             else if (type == VendorType.Lotteria)
@@ -145,7 +145,7 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService();
+                var galaxyService = new GalaxyService(new Requester());
                 return await galaxyService.GetMovieSessions(movieId);
             }
             else if (type == VendorType.Lotteria)
@@ -173,7 +173,7 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService(domain);
+                var galaxyService = new GalaxyService(domain, new Requester());
                 return await galaxyService.GetMovieSessions(movieId);
             }
             else if (type == VendorType.Lotteria)

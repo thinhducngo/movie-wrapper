@@ -6,17 +6,29 @@ using System.Threading.Tasks;
 
 namespace MovieWrapper
 {
+    public interface IRequester
+    {
+        Task<T> Get<T>(string requestUrl);
+        Task<T> Post<T>(string requestUrl, object data);
+        Task<T> Post<T>(string requestUrl, object data, string contentType);
+    }
+
     /// <summary>
     /// REST serivce
     /// </summary>
-    public class Requester
+    public class Requester : IRequester
     {
         public async Task<T> Get<T>(string requestUrl)
         {
             return await Request<T>(requestUrl, "GET");
         }
 
-        public async Task<T> Post<T>(string requestUrl, object data, string contentType = "application/json")
+        public async Task<T> Post<T>(string requestUrl, object data)
+        {
+            return await Request<T>(requestUrl, "POST", data, "application/json");
+        }
+
+        public async Task<T> Post<T>(string requestUrl, object data, string contentType)
         {
             return await Request<T>(requestUrl, "POST", data, contentType);
         }
