@@ -18,7 +18,11 @@ namespace MovieWrapper
 
     public class MovieService : IMovieService
     {
-        public MovieService() { }
+        private readonly IRequester _requester;
+        public MovieService()
+        {
+            _requester = new Requester();
+        }
 
         #region Showing Movies
         /// <summary>
@@ -30,12 +34,12 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService(new Requester());
+                var galaxyService = new GalaxyService(_requester);
                 return await galaxyService.GetShowingMovies();
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService(new Requester());
+                var lotteService = new LotteService(_requester);
                 return await lotteService.GetShowingMovies();
             }
             else
@@ -57,12 +61,12 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService(domain, new Requester());
+                var galaxyService = new GalaxyService(domain, _requester);
                 return await galaxyService.GetShowingMovies();
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService(domain, new Requester());
+                var lotteService = new LotteService(domain, _requester);
                 return await lotteService.GetShowingMovies();
             }
             else
@@ -87,12 +91,12 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService(new Requester());
+                var galaxyService = new GalaxyService(_requester);
                 return await galaxyService.GetMovieDetails(movieId);
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService(new Requester());
+                var lotteService = new LotteService(_requester);
                 return await lotteService.GetMovieDetails(movieId);
             }
             else
@@ -115,12 +119,12 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService(domain, new Requester());
+                var galaxyService = new GalaxyService(domain, _requester);
                 return await galaxyService.GetMovieDetails(movieId);
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService(domain, new Requester());
+                var lotteService = new LotteService(domain, _requester);
                 return await lotteService.GetMovieDetails(movieId);
             }
             else
@@ -145,12 +149,12 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService(new Requester());
+                var galaxyService = new GalaxyService(_requester);
                 return await galaxyService.GetMovieSessions(movieId);
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService(new Requester());
+                var lotteService = new LotteService(_requester);
                 return await lotteService.GetMovieSessions(movieId);
             }
             else
@@ -173,12 +177,12 @@ namespace MovieWrapper
         {
             if (type == VendorType.GalaxyCinema)
             {
-                var galaxyService = new GalaxyService(domain, new Requester());
+                var galaxyService = new GalaxyService(domain, _requester);
                 return await galaxyService.GetMovieSessions(movieId);
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService(domain, new Requester());
+                var lotteService = new LotteService(domain, _requester);
                 return await lotteService.GetMovieSessions(movieId);
             }
             else
