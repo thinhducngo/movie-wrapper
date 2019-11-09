@@ -35,7 +35,7 @@ namespace MovieWrapper
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService();
+                var lotteService = new LotteService(new Requester());
                 return await lotteService.GetShowingMovies();
             }
             else
@@ -62,7 +62,7 @@ namespace MovieWrapper
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService(domain);
+                var lotteService = new LotteService(domain, new Requester());
                 return await lotteService.GetShowingMovies();
             }
             else
@@ -92,7 +92,7 @@ namespace MovieWrapper
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService();
+                var lotteService = new LotteService(new Requester());
                 return await lotteService.GetMovieDetails(movieId);
             }
             else
@@ -120,7 +120,7 @@ namespace MovieWrapper
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService(domain);
+                var lotteService = new LotteService(domain, new Requester());
                 return await lotteService.GetMovieDetails(movieId);
             }
             else
@@ -150,7 +150,7 @@ namespace MovieWrapper
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService();
+                var lotteService = new LotteService(new Requester());
                 return await lotteService.GetMovieSessions(movieId);
             }
             else
@@ -178,7 +178,7 @@ namespace MovieWrapper
             }
             else if (type == VendorType.Lotteria)
             {
-                var lotteService = new LotteService(domain);
+                var lotteService = new LotteService(domain, new Requester());
                 return await lotteService.GetMovieSessions(movieId);
             }
             else

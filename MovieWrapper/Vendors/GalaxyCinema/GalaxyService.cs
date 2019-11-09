@@ -12,6 +12,7 @@ namespace MovieWrapper.Vendors.GalaxyCinema
     {
         private readonly string _domain;
         private readonly IRequester _requester;
+
         public GalaxyService(IRequester requester)
         {
             _domain = "https://www.galaxycine.vn";

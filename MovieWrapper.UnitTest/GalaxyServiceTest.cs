@@ -67,7 +67,6 @@ namespace MovieWrapper.UnitTest
             // assert
             Assert.IsTrue(response.Success);
             Assert.AreEqual(2, response.Data.Count);
-            Assert.AreEqual("43c5a775-0075-4b2e-87e9-7e792ecfddf9", response.Data[0].Id);
 
             Assert.AreEqual("43c5a775-0075-4b2e-87e9-7e792ecfddf9", response.Data[0].Id);
             Assert.AreEqual("Showing 1", response.Data[0].Name);

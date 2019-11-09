@@ -11,14 +11,18 @@ namespace MovieWrapper.Vendors.Lotteria
     public class LotteService : IVendorService
     {
         private readonly string _domain;
-        public LotteService()
+        private readonly IRequester _requester;
+
+        public LotteService(IRequester requester)
         {
             _domain = "http://www.lottecinemavn.com/LCWS";
+            _requester = requester;
         }
 
-        public LotteService(string domain)
+        public LotteService(string domain, IRequester requester)
         {
             _domain = domain;
+            _requester = requester;
         }
 
         /// <summary>
@@ -31,8 +35,7 @@ namespace MovieWrapper.Vendors.Lotteria
             // Handle request exception
             try
             {
-                var request = new Requester();
-                var response = await request.Post<GetMoviesResponse>(
+                var response = await _requester.Post<GetMoviesResponse>(
                     requestUrl: $"{_domain}/Movie/MovieData.aspx",
                     data: "paramList={" + string.Join(",", new[]
                     {
@@ -89,8 +92,7 @@ namespace MovieWrapper.Vendors.Lotteria
             // Handle request exception
             try
             {
-                var request = new Requester();
-                var response = await request.Post<GetMovieDetailResponse>(
+                var response = await _requester.Post<GetMovieDetailResponse>(
                     requestUrl: $"{_domain}/Movie/MovieData.aspx",
                     data: "paramList={" + string.Join(",", new[]
                     {
@@ -141,8 +143,7 @@ namespace MovieWrapper.Vendors.Lotteria
             // Handle request exception
             try
             {
-                var request = new Requester();
-                var response = await request.Post<GetTicketingPageResponse>(
+                var response = await _requester.Post<GetTicketingPageResponse>(
                     requestUrl: $"{_domain}/Ticketing/TicketingData.aspx",
                     data: "paramList={" + string.Join(",", new[]
                     {
@@ -217,23 +218,27 @@ namespace MovieWrapper.Vendors.Lotteria
             string divisionCode,
             string detailDivisionCode)
         {
-            var request = new Requester();
-            var response = await request.Post<GetPlaySequenceResponse>(
-                requestUrl: $"{_domain}/Ticketing/TicketingData.aspx",
-                data: "paramList={" + string.Join(",", new[]
-                {
-                    "MethodName:'GetPlaySequence'",
-                    "channelType:'HO'",
-                    "osType:''",
-                    "osVersion:''",
-                    $"playDate:'{playDate}'",   
-                    $"cinemaID:'{divisionCode}|{detailDivisionCode}|{cinemaID}'",  // format: {devisionCode}|{detailDivisionCode}|cinemaID (predict)
-                    $"representationMovieCode:'{movieId}'"
-                }) + "}",
-                contentType: "application/x-www-form-urlencoded");
+            try
+            {
+                var response = await _requester.Post<GetPlaySequenceResponse>(
+                    requestUrl: $"{_domain}/Ticketing/TicketingData.aspx",
+                    data: "paramList={" + string.Join(",", new[]
+                    {
+                        "MethodName:'GetPlaySequence'",
+                        "channelType:'HO'",
+                        "osType:''",
+                        "osVersion:''",
+                        $"playDate:'{playDate}'",
+                        $"cinemaID:'{divisionCode}|{detailDivisionCode}|{cinemaID}'",  // format: {devisionCode}|{detailDivisionCode}|cinemaID (predict)
+                        $"representationMovieCode:'{movieId}'"
+                    }) + "}",
+                    contentType: "application/x-www-form-urlencoded");
 
-            if (response.IsOK == "true" && response.ResultMessage == "SUCCESS") return response.PlaySeqs.Items;
-            else return new List<LotteMovieSession>();
+                if (response.IsOK == "true" && response.ResultMessage == "SUCCESS") return response.PlaySeqs.Items;
+            }
+            catch (Exception) { }
+
+            return new List<LotteMovieSession>();
         }
 
         /// <summary>
@@ -245,16 +250,14 @@ namespace MovieWrapper.Vendors.Lotteria
         public async Task<Dictionary<string, string>> GetCinemaAddressDict(List<LotteCinemaItem> cinemas)
         {
             var dict = new Dictionary<string, string>();
-            
-            // Handle exception, get address exception should not affect main action
-            try
+            foreach (var cinema in cinemas)
             {
-                foreach (var cinema in cinemas)
+                if (!dict.ContainsKey(cinema.CinemaID)) // advoid duplicate request
                 {
-                    if (!dict.ContainsKey(cinema.CinemaID)) // advoid duplicate request
+                    // Handle exception, get address exception should not affect main action
+                    try
                     {
-                        var request = new Requester();
-                        var response = await request.Post<GetCinemaDetailItem>(
+                        var response = await _requester.Post<GetCinemaDetailItem>(
                             requestUrl: $"{_domain}/Cinema/CinemaData.aspx",
                             data: "paramList={" + string.Join(",", new[]
                             {
@@ -274,10 +277,9 @@ namespace MovieWrapper.Vendors.Lotteria
                             dict.Add(response.CinemaDetail.CinemaID, response.CinemaDetail.Address);
                         }
                     }
+                    catch (Exception) { }
                 }
             }
-            catch (Exception e) { }
-
             return dict;
         }
     }
